@@ -62,7 +62,7 @@ def grade_kata(kata_id: str, submission: Path | None = None) -> int:
         print(f"FAIL: grader returned {code}; only 0 or 2 allowed", file=sys.stderr)
         return 2
     label = "PASS" if code == 0 else "FAIL"
-    print(f"{label}: {kata.name} submission={sub}")
+    print(f"{label}: {kata.name} submission={Path(sub).as_posix()}")
     return code
 
 

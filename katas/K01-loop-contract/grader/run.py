@@ -11,6 +11,13 @@ REQUIRED = [
 def grade(submission: Path) -> int:
     path = submission / "LOOP_CONTRACT.md"
     if not path.is_file():
+        print("FAIL: missing LOOP_CONTRACT.md")
         return 2
     text = path.read_text(encoding="utf-8")
-    return 0 if all(h in text for h in REQUIRED) else 2
+    missing = [h for h in REQUIRED if h not in text]
+    if missing:
+        print("FAIL: missing headings:")
+        for heading in missing:
+            print(f"  - {heading}")
+        return 2
+    return 0

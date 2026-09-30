@@ -1,13 +1,30 @@
-﻿# ai-eng-skill-range
+# skill-range
 
-**Skills lists are easy to copy; graded proof is not. Fifty-six named skills map to twenty-four offline katas you finish, grade with `skillrange grade` (exit 0/2), and fork into hiring or CI harnesses.**
+**Skills lists are easy to copy; graded proof is not.**
 
 [![CI](https://github.com/homayoun-safarpour/ai-eng-skill-range/actions/workflows/ci.yml/badge.svg)](https://github.com/homayoun-safarpour/ai-eng-skill-range/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Progress](https://img.shields.io/badge/katas-24%2F24-green)
 
-Each kata BRIEF includes a **Common fail** note so graders stay sharp when someone takes the short path.
+Graded AI-engineering skill range: 56 skills, 24 katas, deterministic exit-code graders.
+
+```bash
+git clone https://github.com/homayoun-safarpour/ai-eng-skill-range
+cd ai-eng-skill-range && pip install -e .
+skillrange grade K01 --submission katas/K01-loop-contract/fixtures/fail
+```
+
+```text
+FAIL: missing headings:
+  - ## 2. Verifier
+  - ## 3. Stop layers
+  - ## 4. State file
+  - ## 5. Irreversible
+FAIL: K01-loop-contract submission=katas/K01-loop-contract/fixtures/fail
+```
+
+That command exits 2. The same kata on `katas/K01-loop-contract/fixtures/pass` exits 0. Graders are offline and return only 0 or 2.
 
 ## Use this when
 
@@ -18,20 +35,19 @@ Each kata BRIEF includes a **Common fail** note so graders stay sharp when someo
 | You want a 500-lesson curriculum from math to swarms | No - see other roadmaps; this is a kata range |
 | You want a runtime agent framework | No |
 
+Each kata BRIEF includes a **Common fail** note so graders stay sharp when someone takes the short path.
+
 ## Quickstart
 
-Reliability limits: [docs/RELIABILITY_CARD.md](docs/RELIABILITY_CARD.md).
+Interview pack: [docs/INTERVIEW.md](docs/INTERVIEW.md).
+
+Claim boundaries: [docs/RELIABILITY_CARD.md](docs/RELIABILITY_CARD.md).
 
 ```bash
-git clone https://github.com/homayoun-safarpour/ai-eng-skill-range
-cd ai-eng-skill-range
-pip install -e ".[dev]"
 skillrange list
-# attempt a kata: copy starter, edit, grade
 cp -r katas/K01-loop-contract/starter /tmp/k01
 # edit /tmp/k01 ...
 skillrange grade K01 --submission /tmp/k01
-# expect exit 2 until the contract headings are complete
 skillrange grade K01 --submission katas/K01-loop-contract/fixtures/pass
 ```
 
