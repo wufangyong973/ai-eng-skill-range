@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+import tempfile
 import subprocess
 import sys
 from pathlib import Path
@@ -63,3 +64,24 @@ def test_golden_pass_and_fail_exit_codes():
             text=True,
         )
         assert passed.returncode == 0, f"{kid} pass fixture: {passed.stdout} {passed.stderr}"
+
+
+def test_k01_strict_mode_flags_empty_verified_section():
+    """#6: K01 strict fails on a heading with no content; default stays heading-only."""
+    with tempfile.TemporaryDirectory() as tmp:
+        sub = Path(tmp)
+        (sub / "LOOP_CONTRACT.md").write_text(
+            "# Loop Contract\n\n"
+            "## 1. Done\npytest -q exits 0\n\n"
+            "## 2. Verifier\n\n"
+            "## 3. Stop layers\ngoal + 5 ticks\n\n"
+            "## 4. State file\nLOOP_STATE.md\n\n"
+            "## 5. Irreversible\nforce-push needs human yes\n",
+            encoding="utf-8",
+        )
+        base = [sys.executable, "-m", "skillrange", "grade", "K01", "--submission", str(sub)]
+        default = subprocess.run(base, cwd=ROOT, capture_output=True, text=True)
+        assert default.returncode == 0, default.stdout + default.stderr
+        strict = subprocess.run(base + ["--strict"], cwd=ROOT, capture_output=True, text=True)
+        assert strict.returncode == 2, strict.stdout + strict.stderr
+        assert "## 2. Verifier" in strict.stdout

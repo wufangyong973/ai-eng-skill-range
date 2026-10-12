@@ -2,8 +2,11 @@
 __pycache__/
 *.pyc
 .venv/
+temp_auto_push.bat
 venv/
 *.egg-info/
 dist/
 build/
 .ruff_cache/
+.gitignore
+branch_structure.json

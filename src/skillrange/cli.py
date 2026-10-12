@@ -36,7 +36,8 @@ def find_kata(kata_id: str) -> Path:
     raise FileNotFoundError(f"unknown kata: {kata_id}")
 
 
-def load_grade_fn(kata_path: Path):
+def load_grader_module(kata_path: Path):
+    """Load a kata grader module. It must define grade(); it may also define grade_strict()."""
     run_py = kata_path / "grader" / "run.py"
     if not run_py.is_file():
         raise FileNotFoundError(f"missing grader: {run_py}")
@@ -47,12 +48,20 @@ def load_grade_fn(kata_path: Path):
     spec.loader.exec_module(mod)
     if not hasattr(mod, "grade"):
         raise AttributeError(f"{run_py} must define grade(submission: Path) -> int")
-    return mod.grade
+    return mod
 
 
-def grade_kata(kata_id: str, submission: Path | None = None) -> int:
+def load_grade_fn(kata_path: Path):
+    return load_grader_module(kata_path).grade
+
+
+def grade_kata(kata_id: str, submission: Path | None = None, strict: bool = False) -> int:
     kata = find_kata(kata_id)
-    grade = load_grade_fn(kata)
+    module = load_grader_module(kata)
+    if strict:
+        grade = getattr(module, "grade_strict", module.grade)
+    else:
+        grade = module.grade
     sub = submission if submission is not None else kata / "starter"
     if not sub.exists():
         print(f"FAIL: submission path missing: {sub}", file=sys.stderr)
@@ -81,6 +90,11 @@ def main(argv: list[str] | None = None) -> int:
         default=None,
         help="Path to submission directory (default: kata starter/)",
     )
+    p_grade.add_argument(
+        "--strict",
+        action="store_true",
+        help="Use grade_strict() when the kata defines it (e.g. K01 empty-section check)",
+    )
     p_grade.set_defaults(fn="grade")
 
     args = parser.parse_args(argv)
@@ -88,7 +102,7 @@ def main(argv: list[str] | None = None) -> int:
         for path in list_katas():
             print(path.name)
         return 0
-    return grade_kata(args.kata_id, args.submission)
+    return grade_kata(args.kata_id, args.submission, strict=args.strict)
 
 
 if __name__ == "__main__":
